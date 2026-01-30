@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import type { ChangeEvent, KeyboardEvent } from "react"
 import { HugeiconsIcon } from '@hugeicons/react'
 import {  Add01Icon, Cancel01Icon } from '@hugeicons/core-free-icons'
@@ -31,6 +31,29 @@ export default function ProjectSelector() {
   const {data:projects,isLoading} = useProjectsQuery();
   const selectedProject = useSelectedProjectStore((s: SelectedProjectStore) => s.selectedProject);
   const setSelectedProject = useSelectedProjectStore((s: SelectedProjectStore) => s.setSelectedProject);
+  const hasCreatedDemoProject = useRef(false);
+
+  // Automatically create a demo project for new users with no projects
+  useEffect(() => {
+    if (isLoading || hasCreatedDemoProject.current) return;
+    
+    if (projects && projects.length === 0) {
+      hasCreatedDemoProject.current = true;
+      createProject(
+        { name: 'Demo Project' },
+        {
+          onSuccess: (newProject: Project) => {
+            setSelectedProject(newProject);
+            toast.success('Welcome! We\'ve created a demo project to get you started.');
+          },
+          onError: () => {
+            // Reset flag on error so we can retry
+            hasCreatedDemoProject.current = false;
+          }
+        }
+      );
+    }
+  }, [projects, isLoading, createProject, setSelectedProject]);
 
   // Auto-select first project if none selected or current selection is invalid
   useEffect(() => {
