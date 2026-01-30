@@ -115,18 +115,10 @@ export function AppSidebar({user}:{user:User}) {
           <SidebarHeader>
           <div className="px-2 pt-4 flex items-center justify-center">
             <Image
-              src="/Superlamp-light.png"
+              src="/superlamp.png"
               alt="Superlamp logo"
               width={64}
               height={64}
-              className="dark:hidden"
-            />
-            <Image
-              src="/Superlamp-dark.png"
-              alt="Superlamp logo"
-              width={64}
-              height={64}
-              className="hidden dark:block"
             />
           </div>
         </SidebarHeader>

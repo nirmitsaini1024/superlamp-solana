@@ -9,18 +9,10 @@ export default function NavbarLayout() {
       <div className="flex items-center space-x-3">
         <div className="px-6 rounded-xl flex items-center justify-center relative">
           <Image
-            src="/Superlamp-light.png"
+            src="/superlamp.png"
             alt="Superlamp logo"
             width={100}
             height={64}
-            className="dark:hidden"
-          />
-          <Image
-            src="/Superlamp-dark.png"
-            alt="Superlamp logo"
-            width={100}
-            height={64}
-            className="hidden dark:block"
           />
         </div>
       </div>

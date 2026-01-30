@@ -464,19 +464,11 @@ export default function ProfessionalCheckout() {
                     <span>Powered by</span>
                     <div className="flex items-center gap-1">
                       <Image
-                        src="/Superlamp-light.png"
+                        src="/superlamp.png"
                         alt="Superlamp"
                         width={70}
                         height={16}
-                        className="h-3.5 w-auto dark:hidden"
-                        priority
-                      />
-                      <Image
-                        src="/Superlamp-dark.png"
-                        alt="Superlamp"
-                        width={70}
-                        height={16}
-                        className="h-3.5 w-auto hidden dark:block"
+                        className="h-3.5 w-auto"
                         priority
                       />
                     </div>

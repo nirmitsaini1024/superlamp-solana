@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --logo-url: url('/Superlamp-light.png');
+  --logo-url: url('/superlamp.png');
   --sidebar: hsl(0 0% 98%);
   --sidebar-foreground: hsl(240 5.3% 26.1%);
   --sidebar-primary: hsl(240 5.9% 10%);
@@ -17,7 +17,7 @@
 }
 
 [data-theme="dark"], .dark {
-  --logo-url: url('/Superlamp-dark.png');
+  --logo-url: url('/superlamp.png');
 }
 
 .theme-logo {

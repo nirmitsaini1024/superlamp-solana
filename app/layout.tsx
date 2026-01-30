@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/Superlamp-icon.png', type: 'image/png' }
+      { url: '/superlamp.png', type: 'image/png' }
     ],
     apple: '/apple-icon.png',
   },
