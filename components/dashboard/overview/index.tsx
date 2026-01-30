@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useSelectedProjectStore } from '@/store/projectStore'
 import { ModeToggle } from '@/components/ui/theme-toggle'
 import { useProjectFetchDetails } from '@/hooks/projects/useProjectDetailsFetch'
@@ -8,7 +9,6 @@ import { IntegrationStatusSection } from './integration-status-section'
 import { ProjectInfoCards } from './project-info-cards'
 import { OverviewSkeleton } from './overview-skeleton'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
 
 export default function OverviewPage() {
 
