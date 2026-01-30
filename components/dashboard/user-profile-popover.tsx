@@ -2,14 +2,21 @@
 
 import { useState } from "react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { User as UserType } from "better-auth";
 import Image from "next/image"
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ChartDownIcon, Logout01Icon } from '@hugeicons/core-free-icons'
-import { signOut } from "@/lib/auth-client"
+import { useClerk } from "@clerk/nextjs"
+
+type UserType = {
+  id: string
+  name: string
+  email: string
+  image?: string | null
+}
 
 export function UserProfilePopover({ user }: { user: UserType }) {
   const [open, setOpen] = useState(false)
+  const clerk = useClerk()
 
   // const handleProfileClick = () => {
   //   setOpen(false)
@@ -17,8 +24,10 @@ export function UserProfilePopover({ user }: { user: UserType }) {
 
   const handleSignOut = async () => {
     try {
-      await signOut()
-    } finally {
+      await clerk.signOut()
+      window.location.href = "/signin"
+    } catch (error) {
+      console.error("Sign out error:", error)
       window.location.href = "/signin"
     }
 }

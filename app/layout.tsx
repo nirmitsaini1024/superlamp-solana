@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
 import "./globals.css";
+import { ClerkProvider } from '@clerk/nextjs';
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import QueryProvider from "@/components/providers/query-provider";
 import Wallet from "@/components/ui/wallet";
@@ -71,27 +72,29 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body 
-        className={`${dmSans.className} antialiased`}
-      >
-      <PostHogProvider>
-          <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)}/>
-          <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-          >
-            <QueryProvider>
-              <Wallet>
-                {children}
-              </Wallet>
-            </QueryProvider>
-          </ThemeProvider>
-          <Toaster />
-      </PostHogProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" suppressHydrationWarning>
+        <body 
+          className={`${dmSans.className} antialiased`}
+        >
+        <PostHogProvider>
+            <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)}/>
+            <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+            >
+              <QueryProvider>
+                <Wallet>
+                  {children}
+                </Wallet>
+              </QueryProvider>
+            </ThemeProvider>
+            <Toaster />
+        </PostHogProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

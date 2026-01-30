@@ -1,9 +1,13 @@
 'use client'
 
 import { createContext, useContext, ReactNode } from 'react'
-import type { User } from 'better-auth'
 
-type ExtendedUser = User & {
+type ExtendedUser = {
+  id: string
+  name: string
+  email: string
+  emailVerified: boolean
+  image?: string | null
   verifiedAt?: string | Date | null
   walletAddress?: string | null
 }

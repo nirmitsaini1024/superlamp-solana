@@ -1,23 +1,32 @@
-import { customSessionClient } from "better-auth/client/plugins";
-import { createAuthClient } from "better-auth/react";
-import { auth } from "@/lib/auth"; 
+'use client';
 
-export const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_APP_URL,
-  
-  // Better caching configuration using better-auth's built-in options
-  session: {
-    cookieCache: {
-      enabled: true,
-      maxAge: 7 * 24 * 60 * 60 // 7 days
-    },
-    updateAge: 24 * 60 * 60, // Update session data every 24 hours
-    refetchInterval: false, // Disable automatic refetching
-    refetchOnWindowFocus: false, // Don't refetch when window regains focus
-    refetchOnMount: false, // Don't refetch on component mount if we have data
-  },
-  
-  plugins: [customSessionClient<typeof auth>()],
-});
+import { useAuth, useUser, useClerk } from '@clerk/nextjs';
 
-export const { signIn, signUp, signOut, useSession, getSession, $fetch } = authClient;
+// Re-export Clerk hooks for compatibility
+export { useAuth, useUser, useClerk };
+
+// Compatibility exports
+export const useSession = useAuth;
+
+// Sign in helper
+export const signIn = {
+  social: ({ provider, callbackURL, newUserCallbackURL }: {
+    provider: string;
+    callbackURL?: string;
+    newUserCallbackURL?: string;
+  }) => {
+    // This will be handled by the component using useClerk hook
+    // Return a function that can be called
+    return {
+      provider,
+      callbackURL: callbackURL || '/dashboard/overview',
+      newUserCallbackURL: newUserCallbackURL || '/verify',
+    };
+  }
+};
+
+// Sign out helper
+export const signOut = async () => {
+  // This will be handled by the component using useClerk hook
+  return Promise.resolve();
+};

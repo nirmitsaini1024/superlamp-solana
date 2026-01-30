@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import {getSessionCookie} from 'better-auth/cookies'
+import { auth } from '@clerk/nextjs/server';
 
 export async function proxy(request: NextRequest) {
-  const session = getSessionCookie(request);
+  const { userId } = await auth();
   const { pathname } = request.nextUrl;
 
   // Public routes that don't require authentication
@@ -18,13 +18,13 @@ export async function proxy(request: NextRequest) {
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
   
   // If user is not authenticated and trying to access protected routes
-  if (!session && isProtectedRoute) {
+  if (!userId && isProtectedRoute) {
     return NextResponse.redirect(new URL("/signin", request.url));
   }
   
   
   // If user is authenticated and trying to access root, redirect to dashboard
-  if (session && pathname === '/') {
+  if (userId && pathname === '/') {
     return NextResponse.redirect(new URL("/dashboard/overview", request.url));
   }
 

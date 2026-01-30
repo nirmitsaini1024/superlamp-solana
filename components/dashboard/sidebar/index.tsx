@@ -26,7 +26,6 @@ import Image from "next/image"
 import Link from "next/link"
 import { UserProfilePopover } from "@/components/dashboard/user-profile-popover"
 import ProjectSelector from './project-selector'
-import { User } from "better-auth";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import {  ViewTransition } from 'react'

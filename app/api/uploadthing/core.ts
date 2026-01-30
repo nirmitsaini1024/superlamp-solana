@@ -1,6 +1,6 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
-import { auth } from "@/lib/auth";
+import { auth, currentUser } from "@clerk/nextjs/server";
 
 const f = createUploadthing();
 
@@ -14,18 +14,19 @@ export const ourFileRouter = {
   })
     // Set permissions and file types for this FileRoute
     .middleware(async ({ req }) => {
+      const { userId } = await auth();
       
-        const headers = req.headers;
-        if(!headers) throw new UploadThingError("Unauthorized");
-        const session = await auth.api.getSession({
-          headers: headers,
-        });
+      if (!userId) {
+        throw new UploadThingError("Unauthorized");
+      }
 
-      const user = session?.user;
-      if (!user) throw new UploadThingError("Unauthorized");
+      const user = await currentUser();
+      if (!user) {
+        throw new UploadThingError("Unauthorized");
+      }
 
       // Whatever is returned here is accessible in onUploadComplete as `metadata`
-      return { userId: user.id,  };
+      return { userId: user.id };
     })
     .onUploadComplete(async ({ metadata, file }) => {
       

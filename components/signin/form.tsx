@@ -2,26 +2,31 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ChromeIcon, ArrowRight01Icon, Shield01Icon, FingerPrintIcon, LockIcon } from "@hugeicons/core-free-icons"
-import { signIn } from "@/lib/auth-client"
+import { useClerk } from "@clerk/nextjs"
+import { useRouter } from "next/navigation"
 import GlassButton from "../ui/glass-button"
 import { useLoading } from "@/hooks/useLoading"
 import Loader from "../ui/loader"
-export const SignInForm = () => {
 
-  const {startLoading,isLoading} = useLoading();
-    const handleGoogleSignIn = () => {
-        try {
-          startLoading();
-            signIn.social({
-                provider: "google",
-                callbackURL: "/dashboard/overview",
-                newUserCallbackURL: "/verify",
-            })
-          
-        } catch (error) {
-          console.error("Sign in error:", error)
-        } 
-      }
+export const SignInForm = () => {
+  const { startLoading, isLoading } = useLoading();
+  const clerk = useClerk();
+  const router = useRouter();
+
+  const handleGoogleSignIn = async () => {
+    try {
+      startLoading();
+      await clerk.authenticateWithRedirect({
+        strategy: 'oauth_google',
+        redirectUrl: '/dashboard/overview',
+        redirectUrlComplete: '/dashboard/overview',
+      });
+    } catch (error) {
+      console.error("Sign in error:", error)
+      // Fallback: redirect to Clerk's sign-in page
+      router.push('/sign-in');
+    } 
+  }
     
     return (
         <Card className="crypto-glass-static border-0 shadow-2xl relative overflow-hidden">
