@@ -1,3 +1,6 @@
+// Force dynamic rendering - required because this page uses Clerk's auth()
+export const dynamic = "force-dynamic";
+
 import VerifyWalletPage from "@/components/verify-client-component";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";

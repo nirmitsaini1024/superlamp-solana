@@ -1,4 +1,7 @@
-  
+// Force dynamic rendering - required because this layout uses Clerk's auth()
+// which calls headers() and cannot be statically generated
+export const dynamic = "force-dynamic";
+
 import "@/app/globals.css";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/dashboard/sidebar";
