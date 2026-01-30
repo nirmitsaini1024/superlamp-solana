@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ChromeIcon, ArrowRight01Icon, Shield01Icon, FingerPrintIcon, LockIcon } from "@hugeicons/core-free-icons"
-import { useClerk } from "@clerk/nextjs"
+import { useSignIn } from "@clerk/nextjs"
 import { useRouter } from "next/navigation"
 import GlassButton from "../ui/glass-button"
 import { useLoading } from "@/hooks/useLoading"
@@ -10,13 +10,15 @@ import Loader from "../ui/loader"
 
 export const SignInForm = () => {
   const { startLoading, isLoading } = useLoading();
-  const clerk = useClerk();
+  const { signIn, isLoaded } = useSignIn();
   const router = useRouter();
 
   const handleGoogleSignIn = async () => {
+    if (!isLoaded || !signIn) return;
+    
     try {
       startLoading();
-      await clerk.authenticateWithRedirect({
+      await signIn.authenticateWithRedirect({
         strategy: 'oauth_google',
         redirectUrl: '/dashboard/overview',
         redirectUrlComplete: '/dashboard/overview',
