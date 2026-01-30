@@ -16,17 +16,18 @@ export default function OverviewPage() {
   const { data: project, isLoading } = useProjectFetchDetails(selectedProject?.id || '');
   const router = useRouter();
 
-  // Show skeleton when no project is selected or when loading
-  if (!selectedProject || isLoading) {
-    return <OverviewSkeleton />;
-  }
-
   // Redirect to verify page if no wallet address (client-side redirect)
+  // This hook must be called before any conditional returns
   useEffect(() => {
     if (project && !project?.user.walletAddress) {
       router.push('/verify');
     }
   }, [project, router]);
+
+  // Show skeleton when no project is selected or when loading
+  if (!selectedProject || isLoading) {
+    return <OverviewSkeleton />;
+  }
 
   // Don't render if redirecting
   if (project && !project?.user.walletAddress) {

@@ -8,7 +8,7 @@ export interface SelectedProject {
 }
 
 // Define the shape of the entire store, including state and actions
-interface SelectedProjectStore {
+export interface SelectedProjectStore {
     selectedProject: SelectedProject | null;
     setSelectedProject: (project: SelectedProject) => void;
     clearSelectedProject: () => void;

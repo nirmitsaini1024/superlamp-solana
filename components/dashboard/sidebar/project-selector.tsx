@@ -1,5 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
+import type { ChangeEvent, KeyboardEvent } from "react"
 import { HugeiconsIcon } from '@hugeicons/react'
 import {  Add01Icon, Cancel01Icon } from '@hugeicons/core-free-icons'
 import { Button } from "@/components/ui/button"
@@ -20,6 +21,7 @@ import { useCreateProjectMutation } from "@/hooks/projects/useProjectMutation"
 import { useProjectsQuery } from "@/hooks/projects/useProjectQuery"
 import { useSelectedProjectStore } from "@/store/projectStore"
 import type { SelectedProject as Project } from "@/store/projectStore"
+import type { SelectedProjectStore } from "@/store/projectStore"
 
 
 export default function ProjectSelector() {
@@ -27,8 +29,8 @@ export default function ProjectSelector() {
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const {mutate:createProject,isPending:isCreating} = useCreateProjectMutation();
   const {data:projects,isLoading} = useProjectsQuery();
-  const selectedProject = useSelectedProjectStore(s=>s.selectedProject);
-  const setSelectedProject = useSelectedProjectStore(s=>s.setSelectedProject);
+  const selectedProject = useSelectedProjectStore((s: SelectedProjectStore) => s.selectedProject);
+  const setSelectedProject = useSelectedProjectStore((s: SelectedProjectStore) => s.setSelectedProject);
 
   // Auto-select first project if none selected or current selection is invalid
   useEffect(() => {
@@ -41,7 +43,7 @@ export default function ProjectSelector() {
     }
     
     // Check if current selection still exists
-    const projectExists = projects.find(p => p.id === selectedProject.id);
+    const projectExists = projects.find((p: Project) => p.id === selectedProject.id);
     if (!projectExists) {
       // Current selection no longer exists, auto-select first one
       setSelectedProject(projects[0]);
@@ -61,7 +63,7 @@ export default function ProjectSelector() {
       return
     }
     createProject({name:newProjectName},{
-      onSuccess: (newProject)=>{
+      onSuccess: (newProject: Project) => {
         setSelectedProject(newProject)
         closeCreatePopover()
       }
@@ -77,7 +79,7 @@ export default function ProjectSelector() {
 
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' ) {
       handleCreateProject()
     }
@@ -97,8 +99,67 @@ export default function ProjectSelector() {
   if (!projects || projects.length === 0) {
     return (
       <div className="w-full p-3">
-        <div className="h-10 crypto-glass rounded-lg flex items-center justify-center text-sm text-muted-foreground">
-          No projects found
+        <div className="flex gap-2">
+          <div className="flex-1 h-10 crypto-glass rounded-lg flex items-center justify-center text-sm text-muted-foreground">
+            No projects found
+          </div>
+          <Popover open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-10 w-10 crypto-glass border-0 hover:bg-white/5"
+              >
+                <HugeiconsIcon icon={Add01Icon} className="w-4 h-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent 
+              onAnimationEnd={()=>{
+                if(!isCreateOpen){
+                  setNewProjectName('')
+                }
+              }}
+              className="w-80 p-0 crypto-base bg-neutral-100 border-0" 
+              align="end"
+              side="bottom"
+            >
+              <div className="p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-medium">Create New Project</h4>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={closeCreatePopover}
+                    className="h-6 w-6 hover:bg-white/5"
+                  >
+                    <HugeiconsIcon icon={Cancel01Icon} className="w-3 h-3" />
+                  </Button>
+                </div>
+                
+                <div className="space-y-2">
+                  <Input
+                    placeholder="Enter project name..."
+                    value={newProjectName}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setNewProjectName(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="crypto-input border-0 bg-white/5 focus:bg-white/10"
+                    autoFocus
+                  />
+                  
+                  <div className="flex gap-2 justify-end pt-2">
+                    <Button
+                      size="sm"
+                      onClick={handleCreateProject}
+                      disabled={!newProjectName.trim() || isCreating}
+                      className="crypto-input border-0 hover:bg-white/5"
+                    >
+                      {isCreating ? 'Creating...' : 'Create'}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
     )
@@ -125,7 +186,7 @@ export default function ProjectSelector() {
             align="start"
             side="bottom"
           >
-            {projects?.map((project) => (
+            {projects?.map((project: Project) => (
               <DropdownMenuItem
                 key={project.id}
                 onClick={() => handleProjectSelect(project)}
@@ -180,7 +241,7 @@ export default function ProjectSelector() {
                 <Input
                   placeholder="Enter project name..."
                   value={newProjectName}
-                  onChange={(e) => setNewProjectName(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewProjectName(e.target.value)}
                   onKeyDown={handleKeyDown}
                   className="crypto-input border-0 bg-white/5 focus:bg-white/10"
                   autoFocus
