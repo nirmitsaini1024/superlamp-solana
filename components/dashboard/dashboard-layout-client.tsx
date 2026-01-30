@@ -47,7 +47,7 @@ export function DashboardLayoutClient({
       id: user.id,
       userId: user.id,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      createdAt: new Date(user.createdAt),
+      createdAt: user.createdAt ? new Date(user.createdAt) : new Date(),
       updatedAt: new Date(),
     },
   };
