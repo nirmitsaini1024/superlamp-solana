@@ -14,19 +14,24 @@ export const ourFileRouter = {
   })
     // Set permissions and file types for this FileRoute
     .middleware(async ({ req }) => {
-      const { userId } = await auth();
-      
-      if (!userId) {
-        throw new UploadThingError("Unauthorized");
-      }
+      try {
+        const { userId } = await auth();
+        
+        if (!userId) {
+          throw new UploadThingError("Unauthorized");
+        }
 
-      const user = await currentUser();
-      if (!user) {
-        throw new UploadThingError("Unauthorized");
-      }
+        const user = await currentUser();
+        if (!user) {
+          throw new UploadThingError("Unauthorized");
+        }
 
-      // Whatever is returned here is accessible in onUploadComplete as `metadata`
-      return { userId: user.id };
+        // Whatever is returned here is accessible in onUploadComplete as `metadata`
+        return { userId: user.id };
+      } catch (error) {
+        console.error("UploadThing middleware error:", error);
+        throw new UploadThingError("Authentication error");
+      }
     })
     .onUploadComplete(async ({ metadata, file }) => {
       

@@ -12,17 +12,18 @@ export default async function HomeLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { userId } = await auth();
-  
-  if (!userId) {
-    redirect('/signin');
-  }
+  try {
+    const { userId } = await auth();
+    
+    if (!userId) {
+      redirect('/signin');
+    }
 
-  const user = await currentUser();
-  
-  if (!user) {
-    redirect('/signin');
-  }
+    const user = await currentUser();
+    
+    if (!user) {
+      redirect('/signin');
+    }
 
   // Transform Clerk user to match your session format
   const session = {
@@ -56,4 +57,8 @@ export default async function HomeLayout({
       </SessionProvider>
     </ViewTransition>
   );
+  } catch (error) {
+    console.error("Error in dashboard layout:", error);
+    redirect('/signin');
+  }
 }
