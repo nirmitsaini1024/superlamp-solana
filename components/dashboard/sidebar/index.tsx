@@ -31,6 +31,16 @@ import { useRouter } from "next/navigation";
 import {  ViewTransition } from 'react'
 import { GradientBg } from '@/components/ui/gradient-bg'
 
+type User = {
+  id: string
+  name: string
+  email: string
+  emailVerified: boolean
+  image?: string | null
+  verifiedAt?: string | Date | null
+  walletAddress?: string | null
+}
+
 const menuItems = [
   {
     title: "Home",
