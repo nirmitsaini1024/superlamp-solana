@@ -12,9 +12,19 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
+  const { pathname } = request.nextUrl;
+  
+  // Skip auth() call for static files to avoid headers() errors
+  const isStaticFile = pathname.match(/\.(ico|png|jpg|jpeg|svg|gif|webp|css|js|woff|woff2|ttf|eot)$/i) || 
+                       pathname.startsWith('/_next/static') || 
+                       pathname.startsWith('/_next/image');
+  
+  if (isStaticFile) {
+    return NextResponse.next();
+  }
+
   try {
     const { userId } = await auth();
-    const { pathname } = request.nextUrl;
 
     // Public routes - allow access
     if (isPublicRoute(request)) {
@@ -36,8 +46,7 @@ export default clerkMiddleware(async (auth, request) => {
     return NextResponse.next();
   } catch (error) {
     console.error("Clerk middleware error:", error);
-    // For static files or routes that don't need auth, just continue
-    const { pathname } = request.nextUrl;
+    // For errors, allow static files and root to continue
     if (pathname === '/' || pathname.startsWith('/_next') || pathname.match(/\.(ico|png|jpg|jpeg|svg|gif|webp)$/)) {
       return NextResponse.next();
     }
@@ -48,14 +57,11 @@ export default clerkMiddleware(async (auth, request) => {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    // Clerk's recommended pattern for Next.js 16
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
   ],
 };
 
