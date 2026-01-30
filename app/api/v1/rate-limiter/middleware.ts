@@ -1,16 +1,14 @@
 import { NextRequest } from 'next/server'
-import { headers } from 'next/headers'
 import { paymentRateLimit, strictRateLimit, createRateLimitResponse, getRateLimitIdentifier } from '.'
 
 export async function withPaymentRateLimit(handler: (req: NextRequest) => Promise<Response>) {
     return async (req: NextRequest): Promise<Response> => {
         try {
-            // Get request headers
-            const reqHeaders = await headers()
-            const apiKey = reqHeaders.get('X-Superlamp-KEY')
+            // Get request headers from req object
+            const apiKey = req.headers.get('X-Superlamp-KEY')
             
             // Get client IP
-            const forwarded = reqHeaders.get('x-forwarded-for')
+            const forwarded = req.headers.get('x-forwarded-for')
             const ip = forwarded ? forwarded.split(',')[0].trim() : 'unknown'
             
             // Create identifier for rate limiting
@@ -41,7 +39,7 @@ export async function withPaymentRateLimit(handler: (req: NextRequest) => Promis
                     limit,
                     remaining,
                     reset: new Date(reset).toISOString(),
-                    userAgent: reqHeaders.get('user-agent'),
+                    userAgent: req.headers.get('user-agent'),
                     ip
                 })
                 

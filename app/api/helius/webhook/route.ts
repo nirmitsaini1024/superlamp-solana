@@ -1,4 +1,3 @@
-import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/db";
 import { deliverWebhookToAllEndpoints, WebhookEventPayload } from "@/app/api/helius/webhook/webhook-delivery";
@@ -8,9 +7,7 @@ import { getNetworkFromTokenEnvironment, parseMemoDataIntoString } from "./helpe
 import { getMintAddress } from "@/app/api/v1/payments/helpers";
 
 export async function POST(req: NextRequest) {
-  const headersList = await headers();
-
-  const authHeader = headersList.get('Authorization');
+  const authHeader = req.headers.get('Authorization');
 
   if (!authHeader) {
     return NextResponse.json(

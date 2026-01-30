@@ -1,15 +1,13 @@
 import prisma from "@/db";
 import { hashValue } from "@/lib/helpers";
-import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { inputSchema } from "./types";
 import { withPaymentRateLimit } from "../rate-limiter/middleware";
 
 async function paymentHandler(req: NextRequest) {
     try{
-        const reqHeaders = await headers();
-        const apiKey = reqHeaders.get('X-Superlamp-KEY');
-        const idempotencyKey = reqHeaders.get('Idempotency-Key');
+        const apiKey = req.headers.get('X-Superlamp-KEY');
+        const idempotencyKey = req.headers.get('Idempotency-Key');
         
     if (!apiKey) {
         return NextResponse.json({ sessionId: null, error: "API key is required" }, { status: 400 })
