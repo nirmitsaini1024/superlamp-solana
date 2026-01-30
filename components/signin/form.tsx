@@ -18,9 +18,12 @@ export const SignInForm = () => {
     
     try {
       startLoading();
+      // redirectUrl = where OAuth redirects back to (must have AuthenticateWithRedirectCallback)
+      // redirectUrlComplete = where user goes after callback processes
+      const callbackUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/signin/sso-callback`;
       await signIn.authenticateWithRedirect({
         strategy: 'oauth_google',
-        redirectUrl: '/dashboard/overview',
+        redirectUrl: callbackUrl,
         redirectUrlComplete: '/dashboard/overview',
       });
     } catch (error) {

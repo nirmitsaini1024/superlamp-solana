@@ -1,10 +1,29 @@
 import { auth, currentUser } from '@clerk/nextjs/server';
-import { NextRequest } from 'next/server';
+import prisma from '@/db';
 
-export async function createTRPCContext(req: NextRequest) {
+export async function createTRPCContext() {
   try {
     const { userId } = await auth();
     const user = userId ? await currentUser() : null;
+
+    if (user) {
+      // Sync Clerk user to Prisma (required for project.create, etc.)
+      await prisma.user.upsert({
+        where: { id: user.id },
+        create: {
+          id: user.id,
+          name: user.fullName || user.firstName || user.username || 'User',
+          email: user.emailAddresses[0]?.emailAddress || `${user.id}@clerk.user`,
+          emailVerified: user.emailAddresses[0]?.verification?.status === 'verified',
+          image: user.imageUrl,
+          createdAt: new Date(user.createdAt),
+          updatedAt: new Date(),
+          walletAddress: (user.publicMetadata?.walletAddress as string) || null,
+          verifiedAt: null, // Updated via confirmWallet
+        },
+        update: { updatedAt: new Date() },
+      });
+    }
 
     // Transform Clerk user to match your expected session format
     const session = user ? {
@@ -28,7 +47,7 @@ export async function createTRPCContext(req: NextRequest) {
 
     return { session };
   } catch (error) {
-    console.error("Error creating tRPC context:", error);
+    console.error("[tRPC] Context auth error:", error);
     // Return null session on error
     return { session: null };
   }

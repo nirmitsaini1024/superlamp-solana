@@ -11,7 +11,13 @@ export default function QueryProvider({ children }: { children: React.ReactNode 
     links:[
       httpBatchLink({
         url:'/api/trpc',
-        transformer:superjson
+        transformer:superjson,
+        fetch(url, options) {
+          return fetch(url, {
+            ...options,
+            credentials: 'include', // Ensure cookies (Clerk session) are sent
+          });
+        },
       })
     ]
   }))
