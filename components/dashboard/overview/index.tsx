@@ -7,21 +7,31 @@ import { ProjectStatsGrid } from './project-stats-grid'
 import { IntegrationStatusSection } from './integration-status-section'
 import { ProjectInfoCards } from './project-info-cards'
 import { OverviewSkeleton } from './overview-skeleton'
-import { redirect } from 'next/navigation'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 export default function OverviewPage() {
 
   const selectedProject = useSelectedProjectStore(s => s.selectedProject);
   const { data: project, isLoading } = useProjectFetchDetails(selectedProject?.id || '');
+  const router = useRouter();
 
   // Show skeleton when no project is selected or when loading
   if (!selectedProject || isLoading) {
     return <OverviewSkeleton />;
   }
 
-  if(!project?.user.walletAddress){
-    redirect('/verify')
-}
+  // Redirect to verify page if no wallet address (client-side redirect)
+  useEffect(() => {
+    if (project && !project?.user.walletAddress) {
+      router.push('/verify');
+    }
+  }, [project, router]);
+
+  // Don't render if redirecting
+  if (project && !project?.user.walletAddress) {
+    return <OverviewSkeleton />;
+  }
 
   return (
     <div className="min-h-screen rounded-full bg-background p-8">
