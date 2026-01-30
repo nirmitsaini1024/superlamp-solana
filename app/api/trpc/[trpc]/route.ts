@@ -14,7 +14,7 @@ function toStandardRequest(req: NextRequest): Request {
     headers,
     body: req.body,
     duplex: 'half',
-  });
+  } as RequestInit & { duplex?: 'half' });
 }
 
 const handler = (req: NextRequest) => {
