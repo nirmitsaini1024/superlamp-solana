@@ -106,15 +106,15 @@ export function AppSidebar({user}:{user:User}) {
           <SidebarHeader>
           <div className="px-2 pt-4 flex items-center justify-center">
             <Image
-              src="/Okito-light.png"
-              alt="Okito logo"
+              src="/Superlamp-light.png"
+              alt="Superlamp logo"
               width={64}
               height={64}
               className="dark:hidden"
             />
             <Image
-              src="/Okito-dark.png"
-              alt="Okito logo"
+              src="/Superlamp-dark.png"
+              alt="Superlamp logo"
               width={64}
               height={64}
               className="hidden dark:block"

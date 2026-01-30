@@ -19,7 +19,7 @@ const dmSans = DM_Sans({
 
 
 export const metadata: Metadata = {
-  title: "Okito - Solana Payment Platform",
+  title: "Superlamp - Solana Payment Platform",
   description: "Integrate and manage web3 Solana payments seamlessly. Fast, secure, and decentralized payment solutions for modern applications.",
   keywords: ["solana", "payments", "crypto", "web3", "blockchain", "defi", "payment gateway"],
   robots: {
@@ -35,31 +35,31 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/Okito-icon.png', type: 'image/png' }
+      { url: '/Superlamp-icon.png', type: 'image/png' }
     ],
     apple: '/apple-icon.png',
   },
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://app.okito.dev',
-    siteName: 'Okito',
-    title: 'Okito - Solana Payment Platform',
+    url: 'https://app.Superlamp.dev',
+    siteName: 'Superlamp',
+    title: 'Superlamp - Solana Payment Platform',
     description: 'Integrate and manage web3 Solana payments seamlessly. Fast, secure, and decentralized payment solutions for modern applications.',
     images: [
       {
         url: 'https://i7r9sp1sl1.ufs.sh/f/e6Jhr3XgmSqYCdiMwGrRv2QHksbEhUlZO36oWtzc9dgGPB4a',
         width: 1200,
         height: 630,
-        alt: 'Okito - Solana Payment Platform',
+        alt: 'Superlamp - Solana Payment Platform',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    site: '@OkitoLabs',
-    creator: '@OkitoLabs',
-    title: 'Okito - Solana Payment Platform',
+    site: '@SuperlampLabs',
+    creator: '@SuperlampLabs',
+    title: 'Superlamp - Solana Payment Platform',
     description: 'Integrate and manage web3 Solana payments seamlessly. Fast, secure, and decentralized payment solutions for modern applications.',
     images: ['https://i7r9sp1sl1.ufs.sh/f/e6Jhr3XgmSqYCdiMwGrRv2QHksbEhUlZO36oWtzc9dgGPB4a'],
   }

@@ -90,7 +90,7 @@ export default function SignInPage() {
               </Badge>
               
               <h1 className="text-4xl lg:text-5xl font-bold mb-6 leading-tight text-foreground">
-                Welcome to <span className="gradient-text-updated">Okito</span>
+                Welcome to <span className="gradient-text-updated">Superlamp</span>
               </h1>
               
               <p className="text-lg text-muted-foreground mb-8 leading-relaxed">

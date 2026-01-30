@@ -222,7 +222,7 @@ const sampleWebhookTesting = protectedProcedure
     // Decrypt the secret
     const decryptedSecret = await decryptData<string>(webhook.secret)
 
-    // Create sample webhook payload matching OkitoWebhookEventSchema
+    // Create sample webhook payload matching SuperlampWebhookEventSchema
     const samplePayload = {
         id: "test_" + Date.now(),
         type: "WEBHOOK_TEST" as const,
@@ -263,8 +263,8 @@ const sampleWebhookTesting = protectedProcedure
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Okito-Signature': decryptedSecret,
-                'User-Agent': 'Okito-Webhook/1.0'
+                'X-Superlamp-Signature': decryptedSecret,
+                'User-Agent': 'Superlamp-Webhook/1.0'
             },
             body: JSON.stringify(samplePayload),
             signal: AbortSignal.timeout(10000) // 10 second timeout

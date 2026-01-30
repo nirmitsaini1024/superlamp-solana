@@ -52,7 +52,7 @@ export default function OnboardingPage() {
           {/* Header */}
           <div className="text-center mb-8">
             <div className="p-2 mb-4 text-xs">
-              Welcome to Okito
+              Welcome to Superlamp
             </div>            
             
             <h1 className="text-3xl font-bold mb-4 text-foreground">

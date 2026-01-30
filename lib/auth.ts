@@ -4,7 +4,7 @@ import prisma from "@/db/index";
 import { oAuthProxy } from "better-auth/plugins";
 
 export const auth = betterAuth({
-  appName: "Okito",
+  appName: "Superlamp",
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
