@@ -5,14 +5,10 @@ import type { Instruction,MemoData } from "./types";
 const MEMO_PROGRAM_ID = "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr";
 
 // Helper function to determine network based on token environment
+// Force devnet for all environments
 export function getNetworkFromTokenEnvironment(tokenEnvironment?: string): string {
-    if (tokenEnvironment === 'TEST') {
-      return 'devnet';
-    } else if (tokenEnvironment === 'LIVE') {
-      return 'mainnet-beta';
-    }
-    // Default fallback - could also check environment variables
-    return process.env.NODE_ENV === 'production' ? 'mainnet-beta' : 'devnet';
+    // Always return devnet regardless of environment
+    return 'devnet';
   }
 
   

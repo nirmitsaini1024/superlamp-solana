@@ -1,7 +1,7 @@
 import { PublicKey } from "@solana/web3.js";
 export function getMintAddress(
     token: string,
-    network: 'mainnet-beta' | 'devnet' = 'mainnet-beta'
+    network: 'mainnet-beta' | 'devnet' = 'devnet'
   ): PublicKey {
     const MINTS: Record<string, Record<string, string>> = {
       "mainnet-beta": {

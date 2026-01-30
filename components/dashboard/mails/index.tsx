@@ -96,7 +96,7 @@ export default function MailsShowcase() {
                 { name: "Pro Plan", price: 99.99, quantity: 1 },
                 { name: "Extra Seats", price: 23.46, quantity: 2 },
               ]}
-              network="mainnet-beta"
+              network="devnet"
               confirmedAt={new Date().toISOString()}
             />
           )}

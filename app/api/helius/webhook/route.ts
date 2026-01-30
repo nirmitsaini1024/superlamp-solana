@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
       const envForNetwork = event.payment?.token?.environment || event.token?.environment
       const network = getNetworkFromTokenEnvironment(envForNetwork)
       type SolanaNetwork = 'mainnet-beta' | 'devnet'
-      const networkForHelper: SolanaNetwork = network === 'devnet' ? 'devnet' : 'mainnet-beta'
+      const networkForHelper: SolanaNetwork = 'devnet' // Force devnet for all transactions
       let resolvedCurrency: 'USDC' | 'USDT' | null = null
       try {
         if (transferMint) {
