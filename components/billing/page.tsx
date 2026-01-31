@@ -48,7 +48,7 @@ const defaultBillingData: BillingData = {
 export default function ProfessionalCheckout() {
   const { connected} = useWallet()
   const [paymentStatus, setPaymentStatus] = useState<"idle" | "processing" | "success" | "error">("idle")
-  const selectedToken = "SOLANA"
+  const selectedToken = "SOL"
   const [sessionExpiry, setSessionExpiry] = useState(15 * 60) // 15 minutes
   const [billingData, setBillingData] = useState<BillingData>(defaultBillingData)
   const [isInitialLoad, setIsInitialLoad] = useState(true)
@@ -262,7 +262,7 @@ export default function ProfessionalCheckout() {
                   <h2 className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent mb-2">
                     Payment Method
                   </h2>
-                  <p className="text-muted-foreground">Connect your wallet to pay with SOLANA</p>
+                  <p className="text-muted-foreground">Connect your wallet to pay with SOL</p>
                 </div>
 
                 {/* Payment Setup */}
@@ -276,7 +276,7 @@ export default function ProfessionalCheckout() {
                         <div className="relative px-3 py-2 rounded-lg bg-primary/15 text-primary border-2 border-primary/50 shadow-lg shadow-primary/20 crypto-glass-static">
                           <div className="flex items-center gap-2">
                             <span className="font-medium text-xs text-primary">
-                              SOLANA
+                              SOL
                             </span>
                           </div>
                         </div>

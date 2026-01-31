@@ -33,7 +33,7 @@ export function PaymentWidget({
   const networkFee = 0.001
   const totalAmount = subtotal + networkFee
 
-  const formatAmount = (amount: number) => `${amount.toFixed(3)} SOLANA`
+  const formatAmount = (amount: number) => `${amount.toFixed(3)} SOL`
 
   const handlePayment = async () => {
     if (!connected || !publicKey) {
@@ -218,7 +218,7 @@ export function PaymentWidget({
                     <h2 className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent mb-2">
                       Payment Method
                     </h2>
-                    <p className="text-muted-foreground">Connect your wallet to pay with SOLANA</p>
+                    <p className="text-muted-foreground">Connect your wallet to pay with SOL</p>
                   </div>
 
                   {/* Payment Setup */}

@@ -127,7 +127,7 @@ export default function BillingCustomizerWidget({
     }
   }
 
-  const formatAmount = (amount: number) => `${amount.toFixed(3)} SOLANA`
+  const formatAmount = (amount: number) => `${amount.toFixed(3)} SOL`
 
   // Import products from JSON
   const importFromJSON = () => {
@@ -448,7 +448,7 @@ export default function BillingCustomizerWidget({
                                 onChange={(e) => updateProduct(product.id, { price: parseFloat(e.target.value) || 0 })}
                                 className="crypto-base flex-1 text-sm"
                               />
-                              <span className="text-xs text-muted-foreground">SOLANA</span>
+                              <span className="text-xs text-muted-foreground">SOL</span>
                             </div>
                             <div className="flex gap-2">
                               <Button
