@@ -4,20 +4,31 @@ import { NextRequest, NextResponse } from "next/server";
 import { inputSchema } from "./types";
 import { withPaymentRateLimit } from "../rate-limiter/middleware";
 
+// Helper function to add CORS headers
+function addCorsHeaders(response: NextResponse): NextResponse {
+    response.headers.set('Access-Control-Allow-Origin', '*')
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, X-Superlamp-KEY, Idempotency-Key')
+    response.headers.set('Access-Control-Max-Age', '86400')
+    return response
+}
+
 async function paymentHandler(req: NextRequest) {
     try{
         const apiKey = req.headers.get('X-Superlamp-KEY');
         const idempotencyKey = req.headers.get('Idempotency-Key');
         
     if (!apiKey) {
-        return NextResponse.json({ sessionId: null, error: "API key is required" }, { status: 400 })
+        const response = NextResponse.json({ sessionId: null, error: "API key is required" }, { status: 400 })
+        return addCorsHeaders(response)
     }
     
     const body = await req.json();
     const result = await inputSchema.safeParseAsync(body);
     if (!result.success) {
         const errorMessage = result.error.issues.map(i => i.message).join('; ');
-        return NextResponse.json({ sessionId: null, error: `Validation error: ${errorMessage}` }, { status: 400 })
+        const response = NextResponse.json({ sessionId: null, error: `Validation error: ${errorMessage}` }, { status: 400 })
+        return addCorsHeaders(response)
     }
     
     const { products, metadata } = result.data;
@@ -140,7 +151,8 @@ async function paymentHandler(req: NextRequest) {
             throw new Error('Failed to create event with sessionId');
         }
         
-        return NextResponse.json({ sessionId: event.sessionId, error: null })
+        const response = NextResponse.json({ sessionId: event.sessionId, error: null })
+        return addCorsHeaders(response)
         
     } catch (error: unknown) {
         // Handle specific errors
