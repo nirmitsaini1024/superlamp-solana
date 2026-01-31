@@ -22,6 +22,10 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'i7r9sp1sl1.ufs.sh',
+      },
+      {
+        protocol: 'https',
+        hostname: 'raw.githubusercontent.com',
       }
     ],
     formats: ['image/webp', 'image/avif'],
