@@ -3,31 +3,14 @@ import {
   PublicKey, 
   Transaction,
   TransactionInstruction,
+  SystemProgram,
   clusterApiUrl,
+  LAMPORTS_PER_SOL,
 } from '@solana/web3.js'
-import { 
-  getAssociatedTokenAddress,
-  createTransferInstruction,
-  getAccount,
-  TOKEN_PROGRAM_ID,
-} from '@solana/spl-token'
-
-// Token mint addresses
-const TOKEN_MINTS = {
-  USDC: {
-    devnet: '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU',
-    'mainnet-beta': 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
-  },
-  USDT: {
-    devnet: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
-    'mainnet-beta': 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
-  },
-}
 
 export interface ProcessPaymentParams {
   sessionId: string
-  amount: number
-  currency: 'USDC' | 'USDT'
+  amount: number // Amount in SOL
   recipientAddress: string
   senderPublicKey: PublicKey
   signTransaction: (transaction: Transaction) => Promise<Transaction>
@@ -38,56 +21,29 @@ export async function processPaymentTransaction(params: ProcessPaymentParams) {
   const { 
     sessionId, 
     amount, 
-    currency, 
     recipientAddress, 
     senderPublicKey,
     signTransaction,
     network,
   } = params
 
-  // Get token mint address
-  const mintAddress = TOKEN_MINTS[currency][network]
-  if (!mintAddress) {
-    throw new Error(`Token mint not found for ${currency} on ${network}`)
-  }
-
   const connection = new Connection(
     clusterApiUrl(network),
     'confirmed'
   )
 
-  const mintPublicKey = new PublicKey(mintAddress)
   const recipientPublicKey = new PublicKey(recipientAddress)
 
   try {
-    // Get associated token accounts
-    const senderTokenAccount = await getAssociatedTokenAddress(
-      mintPublicKey,
-      senderPublicKey,
-      false,
-      TOKEN_PROGRAM_ID
-    )
+    // Check if sender has enough SOL balance
+    const senderBalance = await connection.getBalance(senderPublicKey)
+    const amountInLamports = BigInt(Math.round(amount * LAMPORTS_PER_SOL))
+    
+    // Reserve some SOL for transaction fees (0.001 SOL should be enough)
+    const minRequiredBalance = amountInLamports + BigInt(0.001 * LAMPORTS_PER_SOL)
 
-    const recipientTokenAccount = await getAssociatedTokenAddress(
-      mintPublicKey,
-      recipientPublicKey,
-      false,
-      TOKEN_PROGRAM_ID
-    )
-
-    // Check if sender has enough balance
-    let senderAccount
-    try {
-      senderAccount = await getAccount(connection, senderTokenAccount)
-    } catch (error) {
-      throw new Error(`No ${currency} token account found. Please ensure you have ${currency} tokens.`)
-    }
-
-    // Convert amount to token decimals (6 for USDC/USDT)
-    const amountInSmallestUnit = BigInt(Math.round(amount * 1_000_000))
-
-    if (senderAccount.amount < amountInSmallestUnit) {
-      throw new Error(`Insufficient ${currency} balance. Required: ${amount} ${currency}`)
+    if (senderBalance < minRequiredBalance) {
+      throw new Error(`Insufficient SOL balance. Required: ${amount} SOL (plus fees)`)
     }
 
     // Create transaction
@@ -98,7 +54,7 @@ export async function processPaymentTransaction(params: ProcessPaymentParams) {
     const memoData = JSON.stringify({
       sessionId,
       amount: amount.toString(),
-      currency,
+      currency: 'SOL',
     })
     
     const memoInstruction = new TransactionInstruction({
@@ -108,15 +64,12 @@ export async function processPaymentTransaction(params: ProcessPaymentParams) {
     })
     transaction.add(memoInstruction)
 
-    // Add token transfer instruction
-    const transferInstruction = createTransferInstruction(
-      senderTokenAccount,
-      recipientTokenAccount,
-      senderPublicKey,
-      amountInSmallestUnit,
-      [],
-      TOKEN_PROGRAM_ID
-    )
+    // Add SOL transfer instruction using SystemProgram
+    const transferInstruction = SystemProgram.transfer({
+      fromPubkey: senderPublicKey,
+      toPubkey: recipientPublicKey,
+      lamports: Number(amountInLamports),
+    })
     transaction.add(transferInstruction)
 
     // Get recent blockhash
@@ -147,5 +100,3 @@ export async function processPaymentTransaction(params: ProcessPaymentParams) {
     throw error
   }
 }
-
-

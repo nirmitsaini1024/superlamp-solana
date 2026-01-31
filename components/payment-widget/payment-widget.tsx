@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { HugeiconsIcon } from "@hugeicons/react"
 import {
   CheckmarkCircle01Icon,
@@ -10,12 +10,9 @@ import {
 } from "@hugeicons/core-free-icons"
 import CustomWallet from "../ui/custom-wallet"
 import { useWallet, useConnection } from "@solana/wallet-adapter-react"
-import Image from "next/image"
 import { toast } from "sonner"
 import { PaymentWidgetConfig, Product, PaymentStatus } from "./types"
 import { processPaymentTransaction } from "./payment-utils"
-
-const supportedTokens = ["USDC", "USDT"] as const
 
 export function PaymentWidget({ 
   apiKey, 
@@ -29,7 +26,6 @@ export function PaymentWidget({
   const { publicKey, connected, signTransaction } = useWallet()
   const { connection } = useConnection()
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>("idle")
-  const [selectedToken, setSelectedToken] = useState<(typeof supportedTokens)[number]>("USDC")
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [txSignature, setTxSignature] = useState<string | null>(null)
 
@@ -37,7 +33,7 @@ export function PaymentWidget({
   const networkFee = 0.001
   const totalAmount = subtotal + networkFee
 
-  const formatAmount = (amount: number) => `${amount.toFixed(3)} ${selectedToken}`
+  const formatAmount = (amount: number) => `${amount.toFixed(3)} SOL`
 
   const handlePayment = async () => {
     if (!connected || !publicKey) {
@@ -91,7 +87,6 @@ export function PaymentWidget({
       const result = await processPaymentTransaction({
         sessionId: data.sessionId,
         amount: totalAmount,
-        currency: selectedToken,
         recipientAddress,
         senderPublicKey: publicKey,
         signTransaction,
@@ -223,7 +218,7 @@ export function PaymentWidget({
                     <h2 className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent mb-2">
                       Payment Method
                     </h2>
-                    <p className="text-muted-foreground">Connect your wallet and select currency</p>
+                    <p className="text-muted-foreground">Connect your wallet to pay with SOL</p>
                   </div>
 
                   {/* Payment Setup */}
@@ -231,51 +226,9 @@ export function PaymentWidget({
                     <div className="space-y-4">
                       <div className="text-sm font-medium text-foreground">Payment Setup</div>
                       
-                      <div className="flex items-center gap-4">
-                        {/* Currency Selection */}
-                        <div className="flex gap-2">
-                          {supportedTokens.map((token) => (
-                            <button
-                              key={token}
-                              onClick={() => setSelectedToken(token)}
-                              className={`relative px-3 py-2 rounded-lg transition-all duration-300 border-2 ${
-                                selectedToken === token
-                                  ? "bg-primary/15 text-primary border-primary/50 shadow-lg shadow-primary/20 crypto-glass-static scale-105"
-                                  : "crypto-glass-static border-transparent hover:border-primary/30 hover:bg-primary/5 hover:scale-105"
-                              }`}
-                            >
-                              <div className="flex items-center gap-2">
-                                <div className={`relative transition-transform duration-300 ${
-                                  selectedToken === token ? "scale-110" : ""
-                                }`}>
-                                  <Image
-                                    src={token === "USDC" 
-                                      ? "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png"
-                                      : "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB/usdt.svg"
-                                    }
-                                    alt={token}
-                                    width={16}
-                                    height={16}
-                                    className="w-4 h-4"
-                                  />
-                                </div>
-                                <span className={`font-medium text-xs ${
-                                  selectedToken === token ? "text-primary" : "text-white"
-                                }`}>
-                                  {token}
-                                </span>
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-
-                        {/* Divider */}
-                        <div className="w-px h-8 bg-gradient-to-b from-transparent via-primary/30 to-transparent"></div>
-
+                      <div className="flex items-center justify-center">
                         {/* Wallet Connection */}
-                        <div className="flex-1">
-                          <CustomWallet />
-                        </div>
+                        <CustomWallet />
                       </div>
                     </div>
                   </div>
