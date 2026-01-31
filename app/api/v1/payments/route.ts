@@ -212,20 +212,23 @@ async function paymentHandler(req: NextRequest) {
                 if (!event?.sessionId) {
                     throw new Error('Existing payment missing event sessionId');
                 }
-                return NextResponse.json({ sessionId: event.sessionId, error: null })
+                const response = NextResponse.json({ sessionId: event.sessionId, error: null })
+                return addCorsHeaders(response)
             }
         }
         
-        return NextResponse.json({ sessionId: null, error: "An unexpected error occurred" }, { status: 500 })
+        const response = NextResponse.json({ sessionId: null, error: "An unexpected error occurred" }, { status: 500 })
+        return addCorsHeaders(response)
     }
 }
 catch(e){
     console.error(e);
-    return NextResponse.json({
+    const response = NextResponse.json({
         msg:"Internal server error"
     },{
         status:500
     })
+    return addCorsHeaders(response)
 }
 }
 

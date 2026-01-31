@@ -40,7 +40,11 @@ export function createRateLimitResponse(limit: number, remaining: number, reset:
         {
             status: 429,
             headers: {
-                'Content-Type': 'application/json',         
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type, X-Superlamp-KEY, Idempotency-Key',
+                'Access-Control-Max-Age': '86400',
                 'X-RateLimit-Limit': limit.toString(),
                 'X-RateLimit-Remaining': remaining.toString(),
                 'X-RateLimit-Reset': reset.toISOString(),
