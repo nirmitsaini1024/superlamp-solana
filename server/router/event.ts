@@ -39,7 +39,11 @@ const getEvents = protectedProcedure
       type: event.type,
       metadata: event.metadata ?? {},
       createdAt: event.createdAt,
-      payment: event.payment
+      payment: event.payment ? {
+        ...event.payment,
+        // Convert USDT to null for backward compatibility, null currency means SOL
+        currency: event.payment.currency === 'USDT' ? null : (event.payment.currency === null ? null : event.payment.currency as 'USDC' | null)
+      } : null
     }));
   });
 
@@ -106,7 +110,11 @@ const getEventsDetails = protectedProcedure
         type: eventDetails.type,
         sessionId: eventDetails.sessionId,
         metadata: eventDetails.metadata ?? {},
-        payment: eventDetails.payment,
+        payment: eventDetails.payment ? {
+            ...eventDetails.payment,
+            // Convert USDT to null (SOL) for backward compatibility
+            currency: eventDetails.payment.currency === 'USDT' ? null : (eventDetails.payment.currency === 'USDC' ? 'USDC' as const : null)
+        } : null,
         deliveries: eventDetails.deliveries,
     }
 

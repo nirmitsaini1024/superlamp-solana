@@ -5,7 +5,7 @@ export const paymentSchema = z.object({
     projectId: z.string(),
     tokenId: z.string(),
     amount: z.bigint(),
-    currency: z.enum(['USDC', 'USDT']).nullable(),
+    currency: z.enum(['USDC']).nullable(), // null = SOL
     recipientAddress: z.string(),
     txHash: z.string().nullable(),
     blockNumber: z.bigint().nullable(),

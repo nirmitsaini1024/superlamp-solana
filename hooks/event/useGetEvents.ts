@@ -16,7 +16,8 @@ export function useFetchEvents(projectId:string){
                 payment: event.payment ? {
                     status: event.payment.status,
                     amount: event.payment.amount as unknown as bigint,
-                    currency: event.payment.currency,
+                    // Map null (SOL) to 'SOL', keep 'USDC' as 'USDC'
+                    currency: event.payment.currency === null ? 'SOL' as const : (event.payment.currency === 'USDC' ? 'USDC' as const : 'SOL' as const),
                 } : null
             }))
         }
