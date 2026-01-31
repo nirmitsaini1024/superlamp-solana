@@ -49,6 +49,12 @@ export async function withPaymentRateLimit(handler: (req: NextRequest) => Promis
             // Add rate limit headers to response
             const response = await handler(req)
             
+            // Add CORS headers
+            response.headers.set('Access-Control-Allow-Origin', '*')
+            response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+            response.headers.set('Access-Control-Allow-Headers', 'Content-Type, X-Superlamp-KEY, Idempotency-Key')
+            response.headers.set('Access-Control-Max-Age', '86400')
+            
             response.headers.set('X-RateLimit-Limit', limit.toString())
             response.headers.set('X-RateLimit-Remaining', remaining.toString())
             response.headers.set('X-RateLimit-Reset', new Date(reset).toISOString())

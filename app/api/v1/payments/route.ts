@@ -171,19 +171,23 @@ async function paymentHandler(req: NextRequest) {
         const errorMeta = prismaError.meta;
         
         if (errorMessage === 'INVALID_API_KEY') {
-            return NextResponse.json({ sessionId: null, error: "Invalid or inactive API key" }, { status: 401 })
+            const response = NextResponse.json({ sessionId: null, error: "Invalid or inactive API key" }, { status: 401 })
+            return addCorsHeaders(response)
         }
         
         if (errorMessage === 'INVALID_AMOUNT') {
-            return NextResponse.json({ sessionId: null, error: "Invalid payment amount" }, { status: 400 })
+            const response = NextResponse.json({ sessionId: null, error: "Invalid payment amount" }, { status: 400 })
+            return addCorsHeaders(response)
         }
         
         if (errorMessage === 'Failed to create event with sessionId') {
-            return NextResponse.json({ sessionId: null, error: "Failed to create payment session" }, { status: 500 })
+            const response = NextResponse.json({ sessionId: null, error: "Failed to create payment session" }, { status: 500 })
+            return addCorsHeaders(response)
         }
         
         if (errorMessage === 'Existing payment missing event sessionId') {
-            return NextResponse.json({ sessionId: null, error: "Existing payment session is invalid" }, { status: 500 })
+            const response = NextResponse.json({ sessionId: null, error: "Existing payment session is invalid" }, { status: 500 })
+            return addCorsHeaders(response)
         }
         
         // Handle unique constraint violations (race condition fallback)
@@ -223,6 +227,16 @@ catch(e){
         status:500
     })
 }
+}
+
+// Handle OPTIONS request for CORS preflight
+export async function OPTIONS(req: NextRequest) {
+    const response = new NextResponse(null, { status: 204 })
+    response.headers.set('Access-Control-Allow-Origin', '*')
+    response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS')
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, X-Superlamp-KEY, Idempotency-Key')
+    response.headers.set('Access-Control-Max-Age', '86400')
+    return response
 }
 
 // Export the POST function with rate limiting applied
