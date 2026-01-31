@@ -39,8 +39,12 @@ export async function POST(req: NextRequest) {
         continue;
       }
 
-      // Skip if no token transfers (not a payment)
-      if (!transaction.tokenTransfers || transaction.tokenTransfers.length === 0) {
+      // Check for both token transfers (SPL tokens) and native transfers (SOL)
+      const hasTokenTransfers = transaction.tokenTransfers && transaction.tokenTransfers.length > 0;
+      const hasNativeTransfers = transaction.nativeTransfers && transaction.nativeTransfers.length > 0;
+      
+      // Skip if no transfers at all (not a payment)
+      if (!hasTokenTransfers && !hasNativeTransfers) {
         continue;
       }
 
@@ -79,9 +83,20 @@ export async function POST(req: NextRequest) {
         continue;
       }
 
-      // Verify the payment amount matches
+      // Verify the payment amount matches - handle both SOL and token transfers
       const expectedAmount = parseFloat(memoData.amount);
-      const actualAmount = transaction.tokenTransfers[0]?.tokenAmount;
+      let actualAmount: number;
+      const isSOLPayment = hasNativeTransfers && !hasTokenTransfers;
+      
+      if (hasTokenTransfers) {
+        // For SPL token transfers (USDC/USDT)
+        actualAmount = transaction.tokenTransfers[0]?.tokenAmount || 0;
+      } else if (hasNativeTransfers) {
+        // For native SOL transfers - convert lamports to SOL
+        actualAmount = (transaction.nativeTransfers[0]?.amount || 0) / 1_000_000_000;
+      } else {
+        continue;
+      }
 
       if (Math.abs(expectedAmount - actualAmount) > 0.000001) {
         // Allow for small floating point differences
@@ -89,6 +104,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Detect currency symbol from related token info, fallback to existing currency
+      // For SOL payments, currency will remain null
       // Try to infer currency from transfer mint and project token environment
       const transfer = transaction.tokenTransfers?.[0]
       const transferMint: string | undefined = transfer?.mint
@@ -98,7 +114,8 @@ export async function POST(req: NextRequest) {
       const networkForHelper: SolanaNetwork = 'devnet' // Force devnet for all transactions
       let resolvedCurrency: 'USDC' | 'USDT' | null = null
       try {
-        if (transferMint) {
+        // Only detect currency for token transfers, not SOL payments
+        if (transferMint && hasTokenTransfers) {
           const usdcMint = getMintAddress('USDC', networkForHelper).toBase58()
           const usdtMint = getMintAddress('USDT', networkForHelper).toBase58()
           if (transferMint === usdcMint) resolvedCurrency = 'USDC'
@@ -150,6 +167,11 @@ export async function POST(req: NextRequest) {
         context.payment!.token?.environment || context.token?.environment;
       const networkContext = getNetworkFromTokenEnvironment(tokenEnvironment);
 
+      // Determine amount conversion divisor based on payment type
+      // SOL payments: stored in lamports (1 SOL = 1,000,000,000 lamports)
+      // Token payments: stored in micro units (1 token = 1,000,000 micro units)
+      const amountDivisor = isSOLPayment ? 1_000_000_000 : 1_000_000;
+
       // Create webhook payload
       const webhookPayload: WebhookEventPayload = {
         id: context.id,
@@ -158,8 +180,8 @@ export async function POST(req: NextRequest) {
         data: {
           sessionId: context.sessionId,
           paymentId: context.payment.id,
-          amount: Number(context.payment.amount) / 1000000, // Convert from lamports to token amount
-          currency: context.payment.currency ?? "USDC",
+          amount: Number(context.payment.amount) / amountDivisor, // Convert based on payment type
+          currency: context.payment.currency ?? (isSOLPayment ? undefined : "USDC"),
           network: networkContext,
           status: "CONFIRMED",
           metadata: event.metadata ?? {},
@@ -172,7 +194,7 @@ export async function POST(req: NextRequest) {
             context.payment.products?.map((product) => ({
               id: product.id,
               name: product.name,
-              price: Number(product.price) / 1000000, // Convert from lamports to token amount
+              price: Number(product.price) / amountDivisor, // Convert based on payment type
               metadata: product.metadata,
             })) || [],
         },
@@ -224,13 +246,13 @@ export async function POST(req: NextRequest) {
           templateProps: {
             projectName: context.project.name,
             customerWalletAddress: context.payment.recipientAddress,
-            amount: Number(context.payment.amount) / 1000000, // Convert from micro units
-            currency: context.payment.currency ?? "USDC",
+            amount: Number(context.payment.amount) / amountDivisor, // Convert based on payment type
+            currency: context.payment.currency ?? (isSOLPayment ? "SOL" : "USDC"),
             transactionSignature: transaction.signature,
             products:
               context.payment.products?.map((product) => ({
                 name: product.name,
-                price: Number(product.price) / 1000000, // Convert from micro units
+                price: Number(product.price) / amountDivisor, // Convert based on payment type
                 quantity: 1, // You might want to add quantity to your product schema
               })) || [],
             network: network,
