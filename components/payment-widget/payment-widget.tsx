@@ -260,7 +260,7 @@ export function PaymentWidget({
                                   />
                                 </div>
                                 <span className={`font-medium text-xs ${
-                                  selectedToken === token ? "text-primary" : "text-foreground"
+                                  selectedToken === token ? "text-primary" : "text-white"
                                 }`}>
                                   {token}
                                 </span>
