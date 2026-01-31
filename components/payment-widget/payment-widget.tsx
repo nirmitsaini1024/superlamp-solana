@@ -249,7 +249,10 @@ export function PaymentWidget({
                                   selectedToken === token ? "scale-110" : ""
                                 }`}>
                                   <Image
-                                    src={token === "USDC" ? "/usd-coin-usdc-logo.svg" : "/tether-usdt-logo.svg"}
+                                    src={token === "USDC" 
+                                      ? "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png"
+                                      : "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB/usdt.svg"
+                                    }
                                     alt={token}
                                     width={16}
                                     height={16}
