@@ -433,16 +433,16 @@ export default function HomePage() {
 
         <div className="crypto-glass-static border-0 rounded-2xl p-6">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center">
-              <HugeiconsIcon icon={DollarCircleIcon} className="w-5 h-5 text-green-500" />
+            <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center">
+              <HugeiconsIcon icon={Coins01Icon} className="w-5 h-5 text-purple-500" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">USDT Revenue</p>
-              <p className="text-2xl font-bold">{formatCurrency(metrics.totalUSDT)}</p>
+              <p className="text-sm text-muted-foreground">SOL Revenue</p>
+              <p className="text-2xl font-bold">{metrics.totalSOL.toFixed(4)} SOL</p>
             </div>
           </div>
           <div className="mt-4 text-xs text-muted-foreground">
-            {((metrics.totalUSDT / metrics.totalRevenue) * 100 || 0).toFixed(1)}% of total
+            {((metrics.totalSOL / metrics.totalRevenue) * 100 || 0).toFixed(1)}% of total
           </div>
         </div>
 
@@ -482,7 +482,7 @@ export default function HomePage() {
               id: string;
               txHash: string | null;
               amount: number;
-              currency: 'USDC' | 'USDT' | null;
+              currency: 'SOL' | 'USDC' | null;
               status: string;
               createdAt: string;
               products: { name: string; price: number }[];
@@ -503,7 +503,9 @@ export default function HomePage() {
                   </div>
                   <div className="text-right">
                     <div className="font-bold text-foreground">
-                      {formatCurrency(tx.amount)}
+                      {tx.currency === 'SOL' 
+                        ? `${tx.amount.toFixed(4)} SOL`
+                        : formatCurrency(tx.amount)}
                     </div>
                     <div className="text-xs text-muted-foreground">
                       {formatDate(tx.createdAt)}
@@ -565,7 +567,7 @@ export default function HomePage() {
                   id: string;
                   txHash: string | null;
                   amount: number;
-                  currency: 'USDC' | 'USDT' | null;
+                  currency: 'SOL' | 'USDC' | null;
                   status: string;
                   createdAt: string;
                   products: { name: string; price: number }[];
@@ -601,7 +603,9 @@ export default function HomePage() {
                     </TableCell>
                     <TableCell>
                       <div className="font-medium text-foreground">
-                        {formatCurrency(tx.amount)}
+                        {tx.currency === 'SOL' 
+                          ? `${tx.amount.toFixed(4)} SOL`
+                          : formatCurrency(tx.amount)}
                       </div>
                     </TableCell>
                     <TableCell>

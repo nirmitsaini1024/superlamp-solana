@@ -35,7 +35,7 @@ type EventItem = {
   payment?: {
     status: 'PENDING' | 'CONFIRMED' | 'FAILED' | 'TIMED_OUT'
     amount: bigint
-    currency: 'USDC' | 'USDT' | null
+    currency: 'SOL' | 'USDC' | null
   } | null
 }
 

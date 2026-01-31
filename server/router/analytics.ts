@@ -71,29 +71,33 @@ const getAnalytics = protectedProcedure
     const confirmedPayments = payments.filter(p => p.status === 'CONFIRMED');
     const totalUSDC = confirmedPayments
       .filter(p => p.currency === 'USDC')
-      .reduce((sum, p) => sum + Number(p.amount), 0) / 1_000_000; // Convert from lamports
+      .reduce((sum, p) => sum + Number(p.amount), 0) / 1_000_000; // Convert from micro-units
     
-    const totalUSDT = confirmedPayments
-      .filter(p => p.currency === 'USDT')
-      .reduce((sum, p) => sum + Number(p.amount), 0) / 1_000_000;
+    const totalSOL = confirmedPayments
+      .filter(p => p.currency === null) // SOL payments have null currency
+      .reduce((sum, p) => sum + Number(p.amount), 0) / 1_000_000_000; // Convert from lamports
     
-    const totalRevenue = totalUSDC + totalUSDT;
+    // Note: SOL and USDC are in different units, so we'll convert SOL to USD equivalent for total
+    // For now, we'll just sum them as-is (you may want to add SOL price conversion later)
+    const totalRevenue = totalUSDC + totalSOL;
     const averageTransactionSize = confirmedPayments.length > 0 
       ? totalRevenue / confirmedPayments.length 
       : 0;
 
     // Revenue over time (daily aggregation with complete timeline)
-    const revenueByDate = new Map<string, { usdc: number; usdt: number }>();
+    const revenueByDate = new Map<string, { sol: number; usdc: number }>();
     
     confirmedPayments.forEach(payment => {
       const dateKey = payment.createdAt.toISOString().split('T')[0];
-      const current = revenueByDate.get(dateKey) || { usdc: 0, usdt: 0 };
+      const current = revenueByDate.get(dateKey) || { sol: 0, usdc: 0 };
       
-      const amount = Number(payment.amount) / 1_000_000;
-      if (payment.currency === 'USDC') {
+      if (payment.currency === null) {
+        // SOL payment - convert from lamports
+        const amount = Number(payment.amount) / 1_000_000_000;
+        current.sol += amount;
+      } else if (payment.currency === 'USDC') {
+        const amount = Number(payment.amount) / 1_000_000;
         current.usdc += amount;
-      } else if (payment.currency === 'USDT') {
-        current.usdt += amount;
       }
       
       revenueByDate.set(dateKey, current);
@@ -101,7 +105,7 @@ const getAnalytics = protectedProcedure
 
     // Generate complete timeline for the selected period
     const generateCompleteTimeline = () => {
-      const timeline: Array<{ date: string; usdc: number; usdt: number; total: number }> = [];
+      const timeline: Array<{ date: string; sol: number; usdc: number; total: number }> = [];
       const currentDate = new Date();
       
       let daysToGenerate = 0;
@@ -130,12 +134,12 @@ const getAnalytics = protectedProcedure
         date.setDate(date.getDate() - i);
         const dateKey = date.toISOString().split('T')[0];
         
-        const data = revenueByDate.get(dateKey) || { usdc: 0, usdt: 0 };
+        const data = revenueByDate.get(dateKey) || { sol: 0, usdc: 0 };
         timeline.push({
           date: dateKey,
+          sol: data.sol,
           usdc: data.usdc,
-          usdt: data.usdt,
-          total: data.usdc + data.usdt,
+          total: data.sol + data.usdc, // Note: mixing units, but for display purposes
         });
       }
       
@@ -232,19 +236,32 @@ const getAnalytics = protectedProcedure
       .sort((a, b) => b.count - a.count);
 
     // Recent transactions (last 10)
-    const recentTransactions = payments.slice(0, 10).map(payment => ({
-      id: payment.id,
-      type: 'PAYMENT',
-      currency: payment.currency,
-      amount: Number(payment.amount) / 1_000_000,
-      status: payment.status,
-      createdAt: payment.createdAt.toISOString(),
-      txHash: payment.txHash,
-      products: payment.products.map(p => ({
-        name: p.name,
-        price: Number(p.price) / 1_000_000,
-      })),
-    }));
+    const recentTransactions = payments.slice(0, 10).map(payment => {
+      // Convert amount based on currency type
+      const isSOL = payment.currency === null;
+      const amount = isSOL 
+        ? Number(payment.amount) / 1_000_000_000 // SOL: convert from lamports
+        : Number(payment.amount) / 1_000_000; // USDC: convert from micro-units
+      
+      return {
+        id: payment.id,
+        type: 'PAYMENT',
+        currency: isSOL ? 'SOL' : (payment.currency as 'USDC' | null),
+        amount,
+        status: payment.status,
+        createdAt: payment.createdAt.toISOString(),
+        txHash: payment.txHash,
+        products: payment.products.map(p => {
+          const productPrice = isSOL
+            ? Number(p.price) / 1_000_000_000
+            : Number(p.price) / 1_000_000;
+          return {
+            name: p.name,
+            price: productPrice,
+          };
+        }),
+      };
+    });
 
     // Webhook statistics
     const webhookEndpoints = await prisma.webhookEndpoint.count({
@@ -297,8 +314,8 @@ const getAnalytics = protectedProcedure
         pendingPayments,
         successRate,
         averageTransactionSize,
+        totalSOL,
         totalUSDC,
-        totalUSDT,
         totalWebhooks: webhookEndpoints,
         webhookSuccessRate,
         apiCallsCount,

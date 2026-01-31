@@ -13,8 +13,8 @@ import {
 
 interface RevenueDataPoint {
   date: string
+  sol: number
   usdc: number
-  usdt: number
   total: number
 }
 
@@ -24,13 +24,13 @@ interface RevenueChartProps {
 }
 
 const chartConfig = {
+  sol: {
+    label: "SOL",
+    color: "#9945FF", // Solana purple
+  },
   usdc: {
     label: "USDC",
     color: "#22c55e",
-  },
-  usdt: {
-    label: "USDT", 
-    color: "#3b82f6",
   },
 } satisfies ChartConfig
 
@@ -81,12 +81,26 @@ export function RevenueChart({ data, height = 300 }: RevenueChartProps) {
             cursor={false} 
             content={<ChartTooltipContent className="crypto-base"
               formatter={(value, name) => [
-                `$${Number(value).toFixed(2)}`,
-                name === 'usdc' ? ' USDC' : ' USDT'
+                name === 'sol' 
+                  ? `${Number(value).toFixed(4)} SOL`
+                  : `$${Number(value).toFixed(2)}`,
+                name === 'sol' ? ' SOL' : ' USDC'
               ]}
             />} 
           />
           <defs>
+            <linearGradient id="fillSol" x1="0" y1="0" x2="0" y2="1">
+              <stop
+                offset="5%"
+                stopColor="#9945FF"
+                stopOpacity={0.8}
+              />
+              <stop
+                offset="95%"
+                stopColor="#9945FF"
+                stopOpacity={0.1}
+              />
+            </linearGradient>
             <linearGradient id="fillUsdc" x1="0" y1="0" x2="0" y2="1">
               <stop
                 offset="5%"
@@ -99,34 +113,22 @@ export function RevenueChart({ data, height = 300 }: RevenueChartProps) {
                 stopOpacity={0.1}
               />
             </linearGradient>
-            <linearGradient id="fillUsdt" x1="0" y1="0" x2="0" y2="1">
-              <stop
-                offset="5%"
-                stopColor="#3b82f6"
-                stopOpacity={0.8}
-              />
-              <stop
-                offset="95%"
-                stopColor="#3b82f6"
-                stopOpacity={0.1}
-              />
-            </linearGradient>
           </defs>
-          <Area
-            dataKey="usdt"
-            type="monotone"
-            fill="url(#fillUsdt)"
-            fillOpacity={0.4}
-            stroke="#3b82f6"
-            strokeWidth={2}
-            stackId="a"
-          />
           <Area
             dataKey="usdc"
             type="monotone"
             fill="url(#fillUsdc)"
             fillOpacity={0.4}
             stroke="#22c55e"
+            strokeWidth={2}
+            stackId="a"
+          />
+          <Area
+            dataKey="sol"
+            type="monotone"
+            fill="url(#fillSol)"
+            fillOpacity={0.4}
+            stroke="#9945FF"
             strokeWidth={2}
             stackId="a"
           />

@@ -9,8 +9,8 @@ export const getAnalyticsSchema = z.object({
 // Response schemas
 export const revenueDataPointSchema = z.object({
   date: z.string(),
+  sol: z.number(),
   usdc: z.number(),
-  usdt: z.number(),
   total: z.number()
 });
 
@@ -50,8 +50,8 @@ export const metricsSchema = z.object({
   pendingPayments: z.number(),
   successRate: z.number(),
   averageTransactionSize: z.number(),
+  totalSOL: z.number(),
   totalUSDC: z.number(),
-  totalUSDT: z.number(),
   totalWebhooks: z.number(),
   webhookSuccessRate: z.number(),
   apiCallsCount: z.number()
@@ -60,7 +60,7 @@ export const metricsSchema = z.object({
 export const recentTransactionSchema = z.object({
   id: z.string(),
   type: z.string(),
-  currency: z.enum(['USDC', 'USDT']).nullable(),
+  currency: z.enum(['SOL', 'USDC']).nullable(),
   amount: z.number(),
   status: z.string(),
   createdAt: z.string(),
