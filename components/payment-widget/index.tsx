@@ -41,7 +41,7 @@ export function PaymentWidgetWithProvider({
             apiUrl={apiUrl}
             recipientAddress={recipientAddress}
             products={products}
-            network={networkType}
+            network={network as 'devnet' | 'mainnet-beta' | undefined}
             onSuccess={onSuccess}
             onError={onError}
           />
