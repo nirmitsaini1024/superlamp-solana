@@ -45,12 +45,10 @@ const defaultBillingData: BillingData = {
   ],
 }
 
-const supportedTokens = ["USDC", "USDT"] as const
-
 export default function ProfessionalCheckout() {
   const { connected} = useWallet()
   const [paymentStatus, setPaymentStatus] = useState<"idle" | "processing" | "success" | "error">("idle")
-  const [selectedToken, setSelectedToken] = useState<(typeof supportedTokens)[number]>("USDC")
+  const selectedToken = "SOLANA"
   const [sessionExpiry, setSessionExpiry] = useState(15 * 60) // 15 minutes
   const [billingData, setBillingData] = useState<BillingData>(defaultBillingData)
   const [isInitialLoad, setIsInitialLoad] = useState(true)
@@ -264,7 +262,7 @@ export default function ProfessionalCheckout() {
                   <h2 className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent mb-2">
                     Payment Method
                   </h2>
-                  <p className="text-muted-foreground">Connect your wallet and select currency</p>
+                  <p className="text-muted-foreground">Connect your wallet to pay with SOLANA</p>
                 </div>
 
                 {/* Payment Setup */}
@@ -273,38 +271,15 @@ export default function ProfessionalCheckout() {
                     <div className="text-sm font-medium text-foreground">Payment Setup</div>
                     
                     <div className="flex items-center gap-4">
-                      {/* Currency Selection */}
+                      {/* Currency Display */}
                       <div className="flex gap-2">
-                        {supportedTokens.map((token) => (
-                          <button
-                            key={token}
-                            onClick={() => setSelectedToken(token)}
-                            className={`relative px-3 py-2 rounded-lg transition-all duration-300 border-2 ${
-                              selectedToken === token
-                                ? "bg-primary/15 text-primary border-primary/50 shadow-lg shadow-primary/20 crypto-glass-static scale-105"
-                                : "crypto-glass-static border-transparent hover:border-primary/30 hover:bg-primary/5 hover:scale-105"
-                            }`}
-                          >
-                            <div className="flex items-center gap-2">
-                              <div className={`relative transition-transform duration-300 ${
-                                selectedToken === token ? "scale-110" : ""
-                              }`}>
-                                <Image
-                                  src={token === "USDC" ? "/usd-coin-usdc-logo.svg" : "/tether-usdt-logo.svg"}
-                                  alt={token}
-                                  width={16}
-                                  height={16}
-                                  className="w-4 h-4"
-                                />
-                              </div>
-                              <span className={`font-medium text-xs ${
-                                selectedToken === token ? "text-primary" : "text-foreground"
-                              }`}>
-                                {token}
-                              </span>
-                            </div>
-                          </button>
-                        ))}
+                        <div className="relative px-3 py-2 rounded-lg bg-primary/15 text-primary border-2 border-primary/50 shadow-lg shadow-primary/20 crypto-glass-static">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-xs text-primary">
+                              SOLANA
+                            </span>
+                          </div>
+                        </div>
                       </div>
 
                       {/* Divider */}
